@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle, FileText, BarChart3 } from 'lucide-react';
+import { AlertTriangle, CheckCircle, BarChart3 } from 'lucide-react';
 
 const Results = ({ results }) => {
   const getStatus = (similarity) => {
@@ -8,24 +8,21 @@ const Results = ({ results }) => {
       label: 'High Similarity', 
       icon: AlertTriangle,
       bgColor: 'bg-red-50',
-      textColor: 'text-red-800',
-      borderColor: 'border-red-200'
+      textColor: 'text-red-800'
     };
     if (similarity >= 40) return { 
       color: 'yellow', 
       label: 'Medium Similarity', 
       icon: AlertTriangle,
       bgColor: 'bg-yellow-50',
-      textColor: 'text-yellow-800',
-      borderColor: 'border-yellow-200'
+      textColor: 'text-yellow-800'
     };
     return { 
       color: 'green', 
       label: 'Low Similarity', 
       icon: CheckCircle,
       bgColor: 'bg-green-50',
-      textColor: 'text-green-800',
-      borderColor: 'border-green-200'
+      textColor: 'text-green-800'
     };
   };
 
@@ -87,10 +84,9 @@ const Results = ({ results }) => {
       <div className="space-y-4">
         {results.map((result) => {
           const status = getStatus(result.similarity);
-          const Icon = status.icon;
           
           return (
-            <div key={result.id} className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <div key={result.id} className="result-comparison-box">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
@@ -105,10 +101,6 @@ const Results = ({ results }) => {
                   <h3 className="text-lg font-semibold text-slate-900 mb-1">
                     {result.file1.name} ↔ {result.file2.name}
                   </h3>
-                  
-                  <div className="text-sm text-slate-600">
-                    Confidence: {result.confidence.toFixed(1)}%
-                  </div>
                 </div>
                 
                 <div className="text-right">
@@ -124,16 +116,27 @@ const Results = ({ results }) => {
 
               {result.matches.length > 0 && (
                 <div className="mt-4 pt-4 border-t border-slate-200">
-                  <h4 className="text-sm font-medium text-slate-900 mb-3">Sample Matches:</h4>
+                  <h4 className="text-sm font-medium text-slate-900 mb-3">
+                    Top {Math.min(5, result.matches.length)} Similar Lines:
+                  </h4>
                   <div className="space-y-2">
-                    {result.matches.slice(0, 2).map((match, index) => (
-                      <div key={index} className="text-xs bg-slate-50 rounded p-2">
-                        <div className="text-slate-600 mb-1">"{match.text1.substring(0, 100)}..."</div>
-                        <div className="text-slate-600">"{match.text2.substring(0, 100)}..."</div>
-                        <div className="text-right text-slate-500 mt-1">{match.similarity}% match</div>
+                    {result.matches.slice(0, 5).map((match, index) => (
+                      <div key={index} className="text-xs bg-slate-50 rounded p-3 border border-slate-200">
+                        <div className="text-slate-700 mb-2 font-medium">Match {index + 1}:</div>
+                        <div className="text-slate-600 mb-1 italic">
+                          "{match.text1.length > 120 ? match.text1.substring(0, 120) + '...' : match.text1}"
+                        </div>
+                        <div className="text-slate-600 italic">
+                          "{match.text2.length > 120 ? match.text2.substring(0, 120) + '...' : match.text2}"
+                        </div>
                       </div>
                     ))}
                   </div>
+                  {result.matches.length > 5 && (
+                    <div className="text-xs text-slate-500 mt-2 text-center">
+                      ... and {result.matches.length - 5} more matches
+                    </div>
+                  )}
                 </div>
               )}
             </div>
